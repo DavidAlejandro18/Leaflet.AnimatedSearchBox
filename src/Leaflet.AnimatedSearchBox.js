@@ -57,14 +57,43 @@
             return this._input.value
         },
 
-        setValue: function (value) {
+        getMetadata: function () {
+            return this._input.dataset
+        },
+
+        setValue: function (value, metadata) {
             this._input.value = value;
+            
+            // Clear current metadata
+            for (const key in this._input.dataset) {
+                delete this._input.dataset[key];
+            }
+
+            // Set new metadata
+            if (metadata) {
+                for (const key in metadata) {
+                    this._input.dataset[key] = metadata[key];
+                }
+            }
+
             return this
         },
 
         addItem: function (item) {
             var listItem = L.DomUtil.create('li', 'leaflet-searchbox-autocomplete-item', this._autocomplete);
-            listItem.textContent = item;
+
+            // If item is a string, set it as text content, otherwise, set text content and metadata
+            if (typeof item === 'string') {
+                listItem.textContent = item;
+            } else if (typeof item === 'object') {
+                let { text, metadata } = item;
+                listItem.textContent = text;
+
+                for (const key in metadata) {
+                    listItem.dataset[key] = metadata[key];
+                }
+            }
+
             this._items.push(listItem);
 
             L.DomUtil.addClass(this._searchboxWrapper, 'open');
@@ -189,7 +218,7 @@
         },
 
         _onListItemClick: function (item) {
-            this.setValue(item.innerHTML);
+            this.setValue(item.innerHTML, item.dataset);
             this._input.focus();
         },
 

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Leaflet.AnimatedSearchBox Example</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../src/Leaflet.AnimatedSearchBox.css">
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: block;
+            position: absolute;
+            height: auto;
+            bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 80%;
+        }
+    </style>
+
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+    <script src="../src/Leaflet.AnimatedSearchBox.js"></script>
+</head>
+
+<body>
+    <a href="https://luka1199.github.io/Leaflet.AnimatedSearchBox/examples/"
+        style="position: absolute; top: 0px; right: 0px;">Other Examples</a>
+    <h1><a href="https://github.com/luka1199/Leaflet.AnimatedSearchBox">Leaflet.AnimatedSearchBox</a>: Basic Example
+    </h1>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map', {
+            zoomControl: false
+        }).setView([51.505, -0.09], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var searchbox = L.control.searchbox({
+            position: 'topright',
+            expand: 'left'
+        }).addTo(map);
+
+        let typingTimer;
+
+        // Close and clear searchbox 600ms after pressing ENTER in the search box
+        searchbox.onInput("keyup", function (e) {
+            clearTimeout(typingTimer);
+            let value = searchbox.getValue();
+
+            typingTimer = setTimeout(() => {
+                let data = [
+                    {
+                        text: "Colorines",
+                        metadata: {
+                            place_id: "ChIJy0HwTC9nzYURjRvdTNNK00k",
+                            foo: "bar"
+                        }
+                    },
+                    {
+                        text: "Casa de las Flores",
+                        metadata: {
+                            place_id: "ChIJmQ8LdcTkxIURBZN7IcK0sZE"
+                        }
+                    },
+                    {
+                        text: "Corte Ingles",
+                        metadata: {
+                            place_id: "ChIJ_fDsz3y-YoYRQ1B6KWbdHZE"
+                        }
+                    }
+                ];
+
+                searchbox.setItems(data);
+            }, 500);
+
+            if (e.keyCode == 13) {
+                setTimeout(function () {
+                    
+                    console.log(value);
+                    searchbox.hide();
+                    searchbox.clear();
+                }, 600);
+            }
+        });
+
+        // Close and clear searchbox 600ms after clicking the search button
+        searchbox.onButton("click", function () {
+            setTimeout(function () {
+                searchbox.hide();
+                searchbox.clear();
+            }, 600);
+        });
+
+        searchbox.onAutocomplete("click", function (e) {
+            e.stopPropagation();
+            let value = searchbox.getValue();
+            let metadata = searchbox.getMetadata();
+
+            console.log(value);
+            console.log(metadata);
+        });
+    </script>
+</body>
+
+</html>
